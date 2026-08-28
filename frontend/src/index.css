@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+@theme {
+  --color-evalora-bg: #0B0F19;
+  --color-evalora-card: #151A28;
+  --color-evalora-accent: #6366F1;
+  --color-evalora-border: #2A3042;
+  --color-evalora-text: #E2E8F0;
+  --color-evalora-muted: #94A3B8;
+  --color-evalora-success: #10B981;
+  --color-evalora-warning: #F59E0B;
+  --color-evalora-danger: #EF4444;
+  --font-sans: 'Inter', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-evalora-bg text-evalora-text font-sans antialiased;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-evalora-card border border-evalora-border rounded-xl shadow-lg shadow-black/20 p-6;
+  }
+  
+  .btn-primary {
+    @apply bg-evalora-accent hover:bg-indigo-500 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent border border-evalora-border hover:border-evalora-muted text-evalora-text font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+}
