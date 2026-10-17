@@ -176,7 +176,7 @@ export const DebatePanel: React.FC<DebatePanelProps> = ({
 
     try {
       // Step 1: Agent 1 — Resume Analyst
-      const res1 = await fetch('/api/v1/pipeline/agent1', {
+      const res1 = await fetch('https://evalora-oxg9.vercel.app/api/v1/pipeline/agent1', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -210,7 +210,7 @@ export const DebatePanel: React.FC<DebatePanelProps> = ({
       } : c));
 
       // Step 2: Agent 2 — Technical Evaluator
-      const res2 = await fetch('/api/v1/pipeline/agent2', {
+      const res2 = await fetch('https://evalora-oxg9.vercel.app/api/v1/pipeline/agent2', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -245,7 +245,7 @@ export const DebatePanel: React.FC<DebatePanelProps> = ({
       } : c));
 
       // Step 3: Agent 3 — Challenger
-      const res3 = await fetch('/api/v1/pipeline/agent3', {
+      const res3 = await fetch('https://evalora-oxg9.vercel.app/api/v1/pipeline/agent3', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -294,7 +294,7 @@ export const DebatePanel: React.FC<DebatePanelProps> = ({
       } : c));
 
       // Step 4: Agent 4 — Hiring Judge
-      const res4 = await fetch('/api/v1/pipeline/agent4', {
+      const res4 = await fetch('https://evalora-oxg9.vercel.app/api/v1/pipeline/agent4', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -763,4 +763,3 @@ export const DebatePanel: React.FC<DebatePanelProps> = ({
     </div>
   );
 };
-
