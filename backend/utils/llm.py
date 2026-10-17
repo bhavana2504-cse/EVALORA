@@ -25,7 +25,7 @@ class LLMProvider:
     """
     def __init__(self):
         self.api_key = os.getenv("GEMINI_API_KEY")
-        self.model = os.getenv("LLM_MODEL", "gemini-3.7-flash")
+        self.model = os.getenv("LLM_MODEL", "gemini-3.8-flash")
         self.client = genai.Client(api_key=self.api_key)
 
     def _generate_with_retry(self, prompt: str, schema=None, max_retries=3):
@@ -36,16 +36,27 @@ class LLMProvider:
                 "response_schema": schema,
             }
         
+        fallback_models = [self.model, "gemini-3.7-flash"] if self.model != "gemini-3.7-flash" else [self.model]
+        
         for attempt in range(max_retries):
+            current_model = fallback_models[min(attempt, len(fallback_models) - 1)]
             try:
                 response = self.client.models.generate_content(
-                    model=self.model,
+                    model=current_model,
                     contents=prompt,
                     config=genai.types.GenerateContentConfig(**config_kwargs) if config_kwargs else None
                 )
+                text = response.text or ""
                 if schema:
-                    return json.loads(response.text)
-                return response.text
+                    cleaned_text = text.strip()
+                    if cleaned_text.startswith("```json"):
+                        cleaned_text = cleaned_text[7:]
+                    elif cleaned_text.startswith("```"):
+                        cleaned_text = cleaned_text[3:]
+                    if cleaned_text.endswith("```"):
+                        cleaned_text = cleaned_text[:-3]
+                    return json.loads(cleaned_text.strip())
+                return text.strip()
             except Exception as e:
                 if attempt == max_retries - 1:
                     raise e
@@ -196,3 +207,60 @@ Agent 3 Output:
 
         prompt = f"You are a Hiring Manager evaluating a what-if scenario. Given the scenario: '{scenario}', how would this change your evaluation? Output the new decision and a brief reason."
         return self._generate_with_retry(prompt, schema=SimulationResult)
+
+    def generate_independent_review(self, agent_persona: str, candidate_data: str) -> dict:
+        """
+        Runs an independent agent review based on the agent's persona.
+        """
+        class IndependentReview(BaseModel):
+            summary: str
+            strengths: list[str]
+            gaps: list[str]
+            evidence: list[str]
+            score: int = Field(description="Score between 0 and 100")
+            confidence: int = Field(description="Confidence percentage 0-100")
+
+        prompt = f"""You are an expert hiring panel member with the following persona:
+{agent_persona}
+
+Analyze the following candidate data and job requirements thoroughly and independently:
+{candidate_data}
+
+Provide your independent evaluation, noting key strengths, gaps/unmet requirements, supporting evidence, an overall score (0-100), and your confidence level (0-100)."""
+        return self._generate_with_retry(prompt, schema=IndependentReview)
+
+    def run_debate_turn(self, context: str, instruction: str) -> str:
+        """
+        Executes a turn in the live multi-agent debate.
+        """
+        prompt = f"""You are participating in a live hiring panel debate.
+Debate Context and Prior Opinions:
+{context}
+
+Your specific role and instruction for this turn:
+{instruction}
+
+State your argument, challenge, or response clearly and concisely in 2 to 4 sentences. Base your reasoning strictly on verifiable candidate evidence and job requirements."""
+        return self._generate_with_retry(prompt)
+
+    def generate_final_decision(self, context: str) -> dict:
+        """
+        Synthesizes the debate and produces the final transparent hiring recommendation.
+        """
+        class FinalDecision(BaseModel):
+            recommendation: str = Field(description="Hire, Reject, or Consider")
+            overall_score: int
+            confidence: int
+            summary: str
+            strengths: list[str]
+            concerns: list[str]
+            key_evidence: list[str]
+            panel_debate: str
+
+        prompt = f"""You are the Lead Hiring Judge evaluating the outcomes of the candidate review and debate.
+Debate Context:
+{context}
+
+Synthesize all opinions, resolve disagreements between panel members, and produce a definitive, transparent, evidence-backed hiring recommendation."""
+        return self._generate_with_retry(prompt, schema=FinalDecision)
+

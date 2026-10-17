@@ -1,2 +1,26 @@
+# Environment and Secret files
 .env
+.env.*
+*.env
+*.pem
+*.key
+*.cert
+
+# Python cache and environments
 __pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# SQLite databases & temp uploads
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs & temp files
+*.log
+logs/
+temp/
+tmp/

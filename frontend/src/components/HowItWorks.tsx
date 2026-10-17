@@ -11,13 +11,13 @@ export const HowItWorks = ({ onStart }: { onStart: () => void }) => {
     },
     {
       title: '2. Independent AI Review',
-      description: 'Four specialized AI agents (HR, Technical, Hiring Manager, Skeptic) analyze the documents independently without influencing one another.',
+      description: 'Four specialized AI agents (Resume Analyst, Technical Evaluator, Challenger, Hiring Judge) analyze the documents independently without premature consensus.',
       icon: <Bot className="w-8 h-8 text-blue-400" />,
       color: 'bg-blue-400/10 border-blue-400/50'
     },
     {
       title: '3. Multi-Agent Debate',
-      description: 'The agents enter a live debate, challenging each other\'s findings. The Skeptic looks for missing evidence while others defend their evaluations.',
+      description: 'The agents enter a live debate, challenging each other\'s findings. The Challenger searches for inflated claims and missing metrics while others defend verifiable evidence.',
       icon: <Layers className="w-8 h-8 text-purple-400" />,
       color: 'bg-purple-400/10 border-purple-400/50'
     },

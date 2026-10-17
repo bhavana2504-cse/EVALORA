@@ -3,19 +3,46 @@
 @theme {
   --color-evalora-bg: #0B0F19;
   --color-evalora-card: #151A28;
+  --color-evalora-card-hover: #1E2538;
   --color-evalora-accent: #6366F1;
+  --color-evalora-accent-light: #818CF8;
   --color-evalora-border: #2A3042;
   --color-evalora-text: #E2E8F0;
   --color-evalora-muted: #94A3B8;
   --color-evalora-success: #10B981;
   --color-evalora-warning: #F59E0B;
   --color-evalora-danger: #EF4444;
-  --font-sans: 'Inter', sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 @layer base {
+  :root {
+    color-scheme: dark;
+  }
+
   body {
     @apply bg-evalora-bg text-evalora-text font-sans antialiased;
+    scrollbar-width: thin;
+    scrollbar-color: #2A3042 #0B0F19;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0B0F19;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #2A3042;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3B435C;
   }
 }
 
@@ -25,10 +52,59 @@
   }
   
   .btn-primary {
-    @apply bg-evalora-accent hover:bg-indigo-500 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-evalora-accent hover:bg-indigo-500 active:scale-[0.98] text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-md shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
   }
 
   .btn-secondary {
-    @apply bg-transparent border border-evalora-border hover:border-evalora-muted text-evalora-text font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-transparent border border-evalora-border hover:border-evalora-muted hover:bg-white/5 active:scale-[0.98] text-evalora-text font-medium py-2 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes basketballShot {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(1) rotate(-10deg);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-30px, -70px) scale(0.95) rotate(-5deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-10px, -130px) scale(0.85) rotate(5deg);
+  }
+  75% {
+    opacity: 1;
+    transform: translate(0, -60px) scale(0.65) rotate(15deg);
+  }
+  90% {
+    opacity: 0.95;
+    transform: translate(0, 25px) scale(0.4) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 75px) scale(0.2) rotate(0deg);
+  }
+}
+
+@keyframes netSwish {
+  0% { transform: scaleX(1) scaleY(1); }
+  40% { transform: scaleX(1.18) scaleY(0.92); }
+  70% { transform: scaleX(0.92) scaleY(1.08); }
+  100% { transform: scaleX(1) scaleY(1); }
+}
+
+.animate-net-swish {
+  transform-origin: top center;
+  animation: netSwish 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
