@@ -1,4 +1,3 @@
-```tsx
 import React, { useState, useRef, useEffect } from 'react';
 import {
   CheckCircle,
@@ -16,8 +15,6 @@ import {
   Link as LinkIcon,
   Play
 } from 'lucide-react';
-
-const API_BASE_URL = 'https://evalora-oxg9.vercel.app';
 
 export interface CandidateItem {
   filename: string;
@@ -228,19 +225,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ onUploadComplete }) => {
     }, 1100);
   };
 
-  // UPDATED: Uses the deployed backend URL.
   const extractTextFromFile = async (file: File): Promise<string> => {
     try {
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch(
-        `${API_BASE_URL}/api/v1/upload/extract-text`,
-        {
-          method: 'POST',
-          body: formData
-        }
-      );
+      const res = await fetch('https://evalora-oxg9.vercel.app/api/v1/upload/extract-text', {
+        method: 'POST',
+        body: formData
+      });
 
       if (res.ok) {
         const data = await res.json();
@@ -585,19 +578,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ onUploadComplete }) => {
         };
       });
 
-      // UPDATED: Uses the deployed backend URL.
-      const response = await fetch(
-        `${API_BASE_URL}/api/v1/upload/process-structured-batch`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            job_description: jobDescription,
-            role: selectedRole,
-            candidates: candidatePayloadItems
-          })
-        }
-      );
+      const response = await fetch('https://evalora-oxg9.vercel.app/api/v1/upload/process-structured-batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          job_description: jobDescription,
+          role: selectedRole,
+          candidates: candidatePayloadItems
+        })
+      });
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
@@ -1351,4 +1340,3 @@ export const Dashboard: React.FC<DashboardProps> = ({ onUploadComplete }) => {
     </div>
   );
 };
-```
