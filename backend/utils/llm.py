@@ -28,39 +28,60 @@ class LLMProvider:
         self.model = os.getenv("LLM_MODEL", "gemini-3.8-flash")
         self.client = genai.Client(api_key=self.api_key)
 
-    def _generate_with_retry(self, prompt: str, schema=None, max_retries=3):
+
+    def _generate_with_retry(self, prompt: str, schema=None, max_retries=4):
         config_kwargs = {}
         if schema:
             config_kwargs = {
                 "response_mime_type": "application/json",
                 "response_schema": schema,
             }
-        
-        fallback_models = [self.model, "gemini-3.7-flash"] if self.model != "gemini-3.7-flash" else [self.model]
-        
+
+        fallback_models = list(dict.fromkeys([self.model, "gemini-3.7-flash"]))
+
+        last_error = None
+
         for attempt in range(max_retries):
             current_model = fallback_models[min(attempt, len(fallback_models) - 1)]
+
             try:
                 response = self.client.models.generate_content(
                     model=current_model,
                     contents=prompt,
-                    config=genai.types.GenerateContentConfig(**config_kwargs) if config_kwargs else None
+                    config=(
+                        genai.types.GenerateContentConfig(**config_kwargs)
+                        if config_kwargs else None
+                    ),
                 )
+
                 text = response.text or ""
+
                 if schema:
                     cleaned_text = text.strip()
                     if cleaned_text.startswith("```json"):
                         cleaned_text = cleaned_text[7:]
                     elif cleaned_text.startswith("```"):
                         cleaned_text = cleaned_text[3:]
+
                     if cleaned_text.endswith("```"):
                         cleaned_text = cleaned_text[:-3]
+
                     return json.loads(cleaned_text.strip())
+
                 return text.strip()
+
             except Exception as e:
-                if attempt == max_retries - 1:
-                    raise e
-                time.sleep(2 ** attempt) # Exponential backoff: 1s, 2s
+                last_error = e
+                print(
+                    f"Gemini attempt {attempt + 1}/{max_retries} "
+                    f"failed on {current_model}: {type(e).__name__}: {e}"
+                )
+
+                if attempt < max_retries - 1:
+                    time.sleep(min(2 ** attempt, 8))
+
+        raise last_error
+
 
     def extract_profile(self, text: str) -> dict:
         """
