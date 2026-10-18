@@ -37,7 +37,7 @@ class LLMProvider:
                 "response_schema": schema,
             }
 
-        fallback_models = list(dict.fromkeys([self.model, "gemini-3.7-flash"]))
+        fallback_models = list(dict.fromkeys([self.model,"gemini-3.1-flash-lite", ]))
 
         last_error = None
 
